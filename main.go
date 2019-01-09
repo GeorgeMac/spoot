@@ -44,7 +44,7 @@ func main() {
 
 	fmt.Printf("Command finished with exit code %d\n", exitCode)
 
-	cmd = NewCommand("echo 'bar' && exit 1")
+	cmd = NewCommand("echo 'bar' && return 1")
 	cmd.Stdout = os.Stdout
 	exitCode, err = shell.Exec(cmd)
 	if err != nil {
@@ -118,7 +118,10 @@ func (shell *Shell) Exec(cmd Command) (int, error) {
 		// cmd.feedStderr(context.TODO(), shell.stderr)
 	}()
 
-	cmdStr := fmt.Sprintf(`sh -c %q;`, strings.Join(cmd.Args, " "))
+	cmdStr := strings.Join(cmd.Args, " ")
+	if !strings.HasPrefix(cmdStr, ";") && !strings.HasPrefix(cmdStr, "&") {
+		cmdStr += ";"
+	}
 
 	fmt.Fprintf(shell, "%s DONTEVERUSETHIS=$?; echo %s $DONTEVERUSETHIS; echo \"exit $DONTEVERUSETHIS\"|sh\n", cmdStr, key.String())
 

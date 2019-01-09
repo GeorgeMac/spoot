@@ -28,7 +28,7 @@ if err != nil {
 
 fmt.Printf("Command finished with exit code %d\n", exitCode)
 
-cmd = spoot.NewCommand("echo 'bar' && exit 1")
+cmd = spoot.NewCommand("echo 'bar' && return 1")
 cmd.Stdout = os.Stdout
 exitCode, err = shell.Exec(cmd)
 if err != nil {
@@ -51,3 +51,4 @@ bash.Process.Kill()
 ## Caveats
 
 - You can only execute one command at a time per long running shell. No concurrent use of `shell.Exec`.
+- Using commands like `exit 1` will kill the long running shell. This is a cognicent decision as we don't want to wrap all commands in a subshell otherwise mutations won't effect subsequent commands in the long running shell.
