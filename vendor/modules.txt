@@ -1,0 +1,2 @@
+# github.com/gofrs/uuid v3.1.0+incompatible
+github.com/gofrs/uuid
