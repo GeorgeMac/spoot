@@ -34,7 +34,7 @@ func main() {
 
 	bash.Start()
 
-	cmd := NewCommand("echo 'foo'")
+	cmd := NewCommand(`export FOO=bar; echo "in shell:   export FOO=BAR"`)
 	cmd.Stdout = os.Stdout
 	exitCode, err := shell.Exec(cmd)
 	if err != nil {
@@ -42,9 +42,9 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("Command finished with exit code %d\n", exitCode)
+	fmt.Printf("in go code: previous command exited with %d\n", exitCode)
 
-	cmd = NewCommand("echo 'bar' && return 1")
+	cmd = NewCommand("echo \"in shell:   $FOO\" && return 1")
 	cmd.Stdout = os.Stdout
 	exitCode, err = shell.Exec(cmd)
 	if err != nil {
@@ -52,7 +52,17 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("Command finished with exit code %d\n", exitCode)
+	fmt.Printf("in go code: previous command exited with %d\n", exitCode)
+
+	cmd = NewCommand("echo \"in shell:   previous command exited with $?\"")
+	cmd.Stdout = os.Stdout
+	exitCode, err = shell.Exec(cmd)
+	if err != nil {
+		bash.Process.Kill()
+		panic(err)
+	}
+
+	fmt.Printf("in go code: previous command exited with %d\n", exitCode)
 
 	bash.Process.Kill()
 }

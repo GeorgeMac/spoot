@@ -18,7 +18,7 @@ if err != nil {
 
 bash.Start()
 
-cmd := spoot.NewCommand("echo 'foo'")
+cmd := spoot.NewCommand(`export FOO=bar; echo "in shell:   export FOO=BAR"`)
 cmd.Stdout = os.Stdout
 exitCode, err := shell.Exec(cmd)
 if err != nil {
@@ -26,9 +26,9 @@ if err != nil {
 	panic(err)
 }
 
-fmt.Printf("Command finished with exit code %d\n", exitCode)
+fmt.Printf("in go code: previous command exited with %d\n", exitCode)
 
-cmd = spoot.NewCommand("echo 'bar' && return 1")
+cmd = spoot.NewCommand("echo \"in shell:   $FOO\" && return 1")
 cmd.Stdout = os.Stdout
 exitCode, err = shell.Exec(cmd)
 if err != nil {
@@ -36,7 +36,17 @@ if err != nil {
 	panic(err)
 }
 
-fmt.Printf("Command finished with exit code %d\n", exitCode)
+fmt.Printf("in go code: previous command exited with %d\n", exitCode)
+
+cmd = spoot.NewCommand("echo \"in shell:   previous command exited with $?\"")
+cmd.Stdout = os.Stdout
+exitCode, err = shell.Exec(cmd)
+if err != nil {
+	bash.Process.Kill()
+	panic(err)
+}
+
+fmt.Printf("in go code: previous command exited with %d\n", exitCode)
 
 bash.Process.Kill()
 ```
